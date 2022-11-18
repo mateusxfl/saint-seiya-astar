@@ -1,60 +1,44 @@
-import { defaultMap } from './config/defaultMap.js';
-import { houses } from './config/houses.js';
-import { knights } from './config/knights.js';
-
 import fs from 'fs';
+import Knight from './models/Knight';
+
+import defaultMap from './config/defaultMap';
+import GridPoint from './models/GridPoint';
+import House from './models/House';
 
 let rows = defaultMap.length;      // Total de linhas da grid.
 let cols = defaultMap[0].length;   // Total de colunas da grid.
-let grid = new Array(rows);        // Definição da grid.
-let openSet = [];                  // Array contendo pontos da grid não visitados.
-let closedSet = [];                // Array contendo pontos da grid já visitados.
-let start;                         // Ponto de partida.
-let end;                           // Ponto de destino.
-let path = [];                     // Array com o caminho traçado.
+let grid: GridPoint[][] = new Array(rows);        // Definição da grid.
+let openSet: GridPoint[] = [];                  // Array contendo pontos da grid não visitados.
+let closedSet: GridPoint[] = [];                // Array contendo pontos da grid já visitados.
+let start: GridPoint;                         // Ponto de partida.
+let end: GridPoint;                           // Ponto de destino.
+let path: GridPoint[] = [];                     // Array com o caminho traçado.
 
-// Função para criar pontos da grid como objetos, contendo os dados do terreno.
-function GridPoint(x, y, ground) {
-  this.x = x;               // Coluna do ponto.
-  this.y = y;               // Linha do ponto.
-  this.f = 0;               // F(x) Função de custo.
-  this.g = 0;               // G(x) Soma do custo dos caminhos até o ponto atual.
-  this.h = 0;               // H(X) Custo estimado até o ponto final.
-  this.cost = 0;            // Custo para atravessar no terreno.
-  this.neighbors = [];      // Vizinhos do ponto atual.
-  this.parent = undefined;  // Pai do do ponto atual.
+const knights = [
+  new Knight(1.5, 'seya.png'),
+  new Knight(1.4, 'shiryu.png'),
+  new Knight(1.3, 'hyoga.png'),
+  new Knight(1.2, 'shun.png'),
+  new Knight(1.1, 'ikki.png'),
+];
 
-  // Define um custo para atravessar esse terreno, com base no tipo do terreno.
-  if (ground == 0) {
-    this.cost = 200;
-  } else if (ground == 1) {
-    this.cost = 1;
-  } else if (ground == 2) {
-    this.cost = 5;
-  }
-
-  // Faz o mapeamento dos vizinhos, para este ponto.
-  this.updateNeighbors = function() {
-    let i = this.x;
-    let j = this.y;
-
-    if (i < cols - 1) {
-      this.neighbors.push(grid[i + 1][j]);
-    }
-    if (i > 0) {
-      this.neighbors.push(grid[i - 1][j]);
-    }
-    if (j < rows - 1) {
-      this.neighbors.push(grid[i][j + 1]);
-    }
-    if (j > 0) {
-      this.neighbors.push(grid[i][j - 1]);
-    }
-  };
-};
+const houses =  [
+  new House(37, 21, 50, "Aries"),
+  new House(31, 17, 55, "Taurus"),
+  new House(31, 33, 60, "Gemini"),
+  new House(24, 26, 70, "Cancer"),
+  new House(24, 9, 75, "Leo"),
+  new House(17, 9, 80, "Virgo"),
+  new House(17, 29, 85, "Libra"),
+  new House(13, 37, 90, "Scorpius"),
+  new House(9, 27, 95, "Sagittarius"),
+  new House(9, 14, 100, "Capricornus"),
+  new House(4, 13, 110, "Aquarius"),
+  new House(4, 30, 120, "Pisces"),
+];
 
 // A heurística que usaremos será a distância de Manhattan.
-function heuristic(position0, position1) {
+function heuristic(position0: GridPoint, position1: GridPoint) {
   let d1 = Math.abs(position1.x - position0.x);
   let d2 = Math.abs(position1.y - position0.y);
 
@@ -78,7 +62,7 @@ function initializeGrid() {
   // Faz o mapeamento de vizinhos, para cada ponto.
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      grid[i][j].updateNeighbors();
+      grid[i][j].updateNeighbors(grid, cols, rows);
     }
   }
 
@@ -86,7 +70,7 @@ function initializeGrid() {
   start = grid[37][37];
   end = grid[4][37];
 
-  // Adiciona o início do percurso no array de de pontos ainda não visitados. 
+  // Adiciona o início do percurso no array de de pontos ainda não visitados.
   openSet.push(start);
 };
 
@@ -102,7 +86,7 @@ function getIndexOfLowestFxInOpenSet(){
 }
 
 // Retorna o caminho final, caso a função objetivo tenha sido satisfeita.
-function getFinalPath(currentPoint){
+function getFinalPath(currentPoint: GridPoint){
   let temp = currentPoint;
 
   path.push(temp);
@@ -111,16 +95,16 @@ function getFinalPath(currentPoint){
     path.push(temp.parent);
     temp = temp.parent;
   }
-  
+
   return path.reverse();
 }
 
 // Marca o caminho achado grid, no mapWithTracedPath.txt.
-function drawPath(finalPath){
+function drawPath(finalPath: GridPoint[]){
   for (let i = 0; i < finalPath.length; i++) {
     defaultMap[finalPath[i].x][finalPath[i].y] += 6;
   }
-  
+
   let data = '[\n';
   for (let i = 0; i < rows; i++) {
     data += '\t['
@@ -133,14 +117,14 @@ function drawPath(finalPath){
     data += '],\n'
   }
   data += ']';
-  
+
   fs.writeFile('./src/mapWithTracedPath.txt', data, (err) => {
     if (err) throw err;
   });
 }
 
 // Retorna um número aleatório em um intervalo.
-function randomIntFromInterval(min, max) {
+function randomIntFromInterval(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -188,11 +172,11 @@ function search() {
       if (!closedSet.includes(neighbor)) {
         // Define (ou redefine) um possível novo G para esse vizinho.
         let possibleNewG = currentPoint.g + neighbor.f + neighbor.cost;
-        
+
         // Adiciona o vizinho no array openSet, caso ainda não tenha o mesmo.
-        if (!openSet.includes(neighbor)) {    
+        if (!openSet.includes(neighbor)) {
           openSet.push(neighbor);
-        } else if (possibleNewG >= neighbor.g) { 
+        } else if (possibleNewG >= neighbor.g) {
           continue;
         }
 
