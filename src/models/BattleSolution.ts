@@ -1,4 +1,4 @@
-import Knight from "./Knight";
+import Knight from './Knight';
 
 class BattleSolution {
   public knights: Knight[];

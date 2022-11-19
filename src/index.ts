@@ -248,3 +248,10 @@ function search() {
 generateRandomPath();
 
 drawPath(search());
+
+const totalBattleTime = battlesSolutions.reduce(
+  (acc, item) => acc + item.time,
+  0,
+);
+
+console.log(`Tempo total das batalhas: ${totalBattleTime / 60}`);
