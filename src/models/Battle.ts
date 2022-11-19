@@ -1,81 +1,68 @@
-
-import Heap from 'heap-js';
-
-import { getCombinations } from "../utils/math";
 import House from "./House";
 import Knight from "./Knight";
+import BattleSolution from "./BattleSolution";
 
-class Vertice {
-    public knights: Knight[];
-    public knightsTotal: number;
-    public time: number;
-    public heuristic: number;
-
-    constructor(knights: Knight[], time: number, powerByLife: number) {
-        this.knights = knights;
-        this.knightsTotal = this.knights.length || 0;
-        this.time = time;
-        this.heuristic = time / powerByLife; 
-    }
-}
+import getCombinations from "../utils/combination";
 
 class Battle {
-    constructor(
-        public knights: Knight[],
-        public house: House 
-    ){}
+  constructor(public knights: Knight[], public house: House) {}
 
-    public getTime(knights: Knight[]) {
-        let powerAmount = 0;
-        let powerByLife = 0;
+  public getTime(knights: Knight[]) {
+    let powerAmount = 0;
+    let powerByLife = 0;
 
-        knights.forEach((knight) => {
-            powerAmount += knight.power;
+    knights.forEach((knight) => {
+      powerAmount += knight.power;
 
-            if (knight.life < 5) {
-                powerByLife += knight.power * (5 - knight.life +2)
-            } else {
-                powerByLife += knight.power;
-            }
-        });
+      if (knight.life < 5) {
+        powerByLife += knight.power * (5 - knight.life + 2);
+      } else {
+        powerByLife += knight.power;
+      }
+    });
 
-        return {
-            time: this.house.difficulty / powerAmount,
-            powerByLife
-        };
-    }
+    return {
+      time: this.house.difficulty / powerAmount,
+      powerByLife,
+    };
+  }
 
-    public search() {
-        const list = [];
+  public search() {
+    const list = [];
 
-        const frontier: Vertice[] = [];
-        const { powerByLife, time } = this.getTime(this.knights);
+    const frontier: BattleSolution[] = [];
+    const { powerByLife, time } = this.getTime(this.knights);
 
-        const vertice = new Vertice(this.knights, time, powerByLife);
-        frontier.push(vertice);
+    const battleSolution = new BattleSolution(this.knights, time, powerByLife);
+    frontier.push(battleSolution);
 
-        while (frontier.length > 0) {
-            const v = frontier.pop() || {} as Vertice;
+    while (frontier.length > 0) {
+      const v = frontier.pop() || ({} as BattleSolution);
 
-            if (v?.knightsTotal > 1) {
-                const knightsCombination = getCombinations(v.knights, v.knightsTotal - 1);
+      if (v?.knightsTotal > 1) {
+        const knightsCombination = getCombinations(
+          v.knights,
+          v.knightsTotal - 1
+        );
 
-                for (const comb of knightsCombination) {
-                    const timeOfCombination = this.getTime(comb);
-                    const verticeOfCombination = new Vertice(comb, timeOfCombination.time, timeOfCombination.powerByLife);
+        for (const comb of knightsCombination) {
+          const timeOfCombination = this.getTime(comb);
+          const solutionOfCombination = new BattleSolution(
+            comb,
+            timeOfCombination.time,
+            timeOfCombination.powerByLife
+          );
 
-                    list.push(verticeOfCombination);
-                    frontier.push(verticeOfCombination);
-                }
-            }
+          list.push(solutionOfCombination);
+          frontier.push(solutionOfCombination);
         }
-
-        const orderedList = list.sort((a, b) => a.heuristic - b.heuristic);
-        
-        console.log(orderedList);
-        
-        return orderedList[0];
+      }
     }
+
+    const orderedList = list.sort((a, b) => a.heuristic - b.heuristic);
+
+    return orderedList[0];
+  }
 }
 
 export default Battle;

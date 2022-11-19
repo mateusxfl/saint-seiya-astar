@@ -1,28 +1,30 @@
-import fs from 'fs';
-import Knight from './models/Knight';
+import fs from "fs";
+import Knight from "./models/Knight";
 
-import defaultMap from './config/defaultMap';
-import GridPoint from './models/GridPoint';
-import House from './models/House';
+import defaultMap from "./config/defaultMap";
+import GridPoint from "./models/GridPoint";
+import House from "./models/House";
+import BattleSolution from "./models/BattleSolution";
+import Battle from "./models/Battle";
 
-let rows = defaultMap.length;      // Total de linhas da grid.
-let cols = defaultMap[0].length;   // Total de colunas da grid.
-let grid: GridPoint[][] = new Array(rows);        // Definição da grid.
-let openSet: GridPoint[] = [];                  // Array contendo pontos da grid não visitados.
-let closedSet: GridPoint[] = [];                // Array contendo pontos da grid já visitados.
-let start: GridPoint;                         // Ponto de partida.
-let end: GridPoint;                           // Ponto de destino.
-let path: GridPoint[] = [];                     // Array com o caminho traçado.
+const rows = defaultMap.length; // Total de linhas da grid.
+const cols = defaultMap[0].length; // Total de colunas da grid.
+const grid: GridPoint[][] = new Array(rows); // Definição da grid.
+const openSet: GridPoint[] = []; // Array contendo pontos da grid não visitados.
+const closedSet: GridPoint[] = []; // Array contendo pontos da grid já visitados.
+let start: GridPoint; // Ponto de partida.
+let end: GridPoint; // Ponto de destino.
+const path: GridPoint[] = []; // Array com o caminho traçado.
 
 const knights = [
-  new Knight(1.5, 'seya.png'),
-  new Knight(1.4, 'shiryu.png'),
-  new Knight(1.3, 'hyoga.png'),
-  new Knight(1.2, 'shun.png'),
-  new Knight(1.1, 'ikki.png'),
+  new Knight(1.5, "seya.png"),
+  new Knight(1.4, "shiryu.png"),
+  new Knight(1.3, "hyoga.png"),
+  new Knight(1.2, "shun.png"),
+  new Knight(1.1, "ikki.png"),
 ];
 
-const houses =  [
+const houses = [
   new House(37, 21, 50, "Aries"),
   new House(31, 17, 55, "Taurus"),
   new House(31, 33, 60, "Gemini"),
@@ -37,10 +39,12 @@ const houses =  [
   new House(4, 30, 120, "Pisces"),
 ];
 
+const battlesSolutions: BattleSolution[] = [];
+
 // A heurística que usaremos será a distância de Manhattan.
 function heuristic(position0: GridPoint, position1: GridPoint) {
-  let d1 = Math.abs(position1.x - position0.x);
-  let d2 = Math.abs(position1.y - position0.y);
+  const d1 = Math.abs(position1.x - position0.x);
+  const d2 = Math.abs(position1.y - position0.y);
 
   return d1 + d2;
 }
@@ -48,36 +52,38 @@ function heuristic(position0: GridPoint, position1: GridPoint) {
 // Inicializa todos os pontos da grid, fazendo o mapeamento completo para cada um.
 function initializeGrid() {
   // Cria uma matriz, adicionando colunas.
-  for (let i = 0; i < rows; i++) {
+  for (let i = 0; i < rows; i += 1) {
     grid[i] = new Array(cols);
   }
 
   // Faz o mapeamento da grid, adicionando um GridPoint para cada posição da matriz, passando também o tipo de terreno.
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
+  for (let i = 0; i < rows; i += 1) {
+    for (let j = 0; j < cols; j += 1) {
       grid[i][j] = new GridPoint(i, j, defaultMap[i][j]);
     }
   }
 
   // Faz o mapeamento de vizinhos, para cada ponto.
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
+  for (let i = 0; i < rows; i += 1) {
+    for (let j = 0; j < cols; j += 1) {
       grid[i][j].updateNeighbors(grid, cols, rows);
     }
   }
 
   // Define ponto inicial e final do percurso.
+  // eslint-disable-next-line prefer-destructuring
   start = grid[37][37];
+  // eslint-disable-next-line prefer-destructuring
   end = grid[4][37];
 
   // Adiciona o início do percurso no array de de pontos ainda não visitados.
   openSet.push(start);
-};
+}
 
 // Busca o indíce do ponto de menor F(x) dentre os as possibilidades em aberto, ou seja, não visitadas.
-function getIndexOfLowestFxInOpenSet(){
+function getIndexOfLowestFxInOpenSet() {
   let indexOfLowestFx = 0;
-  for (let i = 0; i < openSet.length; i++) {
+  for (let i = 0; i < openSet.length; i += 1) {
     if (openSet[i].f < openSet[indexOfLowestFx].f) {
       indexOfLowestFx = i;
     }
@@ -86,7 +92,7 @@ function getIndexOfLowestFxInOpenSet(){
 }
 
 // Retorna o caminho final, caso a função objetivo tenha sido satisfeita.
-function getFinalPath(currentPoint: GridPoint){
+function getFinalPath(currentPoint: GridPoint) {
   let temp = currentPoint;
 
   path.push(temp);
@@ -100,25 +106,25 @@ function getFinalPath(currentPoint: GridPoint){
 }
 
 // Marca o caminho achado grid, no mapWithTracedPath.txt.
-function drawPath(finalPath: GridPoint[]){
-  for (let i = 0; i < finalPath.length; i++) {
+function drawPath(finalPath: GridPoint[]) {
+  for (let i = 0; i < finalPath.length; i += 1) {
     defaultMap[finalPath[i].x][finalPath[i].y] += 6;
   }
 
-  let data = '[\n';
-  for (let i = 0; i < rows; i++) {
-    data += '\t['
-    for (let j = 0; j < cols; j++) {
-      data += defaultMap[i][j]
-      if((j+1) != cols){
-        data += ',';
+  let data = "[\n";
+  for (let i = 0; i < rows; i += 1) {
+    data += "\t[";
+    for (let j = 0; j < cols; j += 1) {
+      data += defaultMap[i][j];
+      if (j + 1 !== cols) {
+        data += ",";
       }
     }
-    data += '],\n'
+    data += "],\n";
   }
-  data += ']';
+  data += "]";
 
-  fs.writeFile('./src/mapWithTracedPath.txt', data, (err) => {
+  fs.writeFile("./src/mapWithTracedPath.txt", data, (err) => {
     if (err) throw err;
   });
 }
@@ -129,11 +135,11 @@ function randomIntFromInterval(min: number, max: number) {
 }
 
 // Gera uma grid com terrenos aleatórios, com base na grid default.
-function generateRandomPath(){
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      if(defaultMap[i][j] == 1 || defaultMap[i][j] == 2){
-        defaultMap[i][j] = randomIntFromInterval(1,2);
+function generateRandomPath() {
+  for (let i = 0; i < rows; i += 1) {
+    for (let j = 0; j < cols; j += 1) {
+      if (defaultMap[i][j] === 1 || defaultMap[i][j] === 2) {
+        defaultMap[i][j] = randomIntFromInterval(1, 2);
       }
     }
   }
@@ -145,14 +151,48 @@ function search() {
 
   // Cada iteração desse while é uma visita.
   while (openSet.length > 0) {
-    let indexOfLowestFx = getIndexOfLowestFxInOpenSet();
+    const indexOfLowestFx = getIndexOfLowestFxInOpenSet();
 
-    let currentPoint = openSet[indexOfLowestFx];
+    const currentPoint = openSet[indexOfLowestFx];
 
     // Função objetivo, verificando se o nó atende a condição de parada.
     if (currentPoint === end) {
-      console.log("Função objetivo satisfeita, o menor caminho foi encontrado!!!");
+      console.log(
+        "Função objetivo satisfeita, o menor caminho foi encontrado!!!"
+      );
       return getFinalPath(currentPoint);
+    }
+
+    const findHouse = houses.find(
+      (house) =>
+        house.position_x === currentPoint.x &&
+        house.position_y === currentPoint.y
+    );
+
+    if (findHouse) {
+      const availableKnights = knights.filter((item) => item.life > 0);
+
+      const battleSolution = new Battle(availableKnights, findHouse).search();
+
+      if (!battleSolution?.knights) {
+        console.log(`No solution for ${findHouse.title}`);
+      } else {
+        battleSolution.knights.forEach((knight) => {
+          const updatedKnight = knight;
+          updatedKnight.life -= 1;
+          const knightIndex = knights.findIndex(
+            (k) => k.image === knight.image
+          );
+
+          knights.splice(knightIndex, 1, updatedKnight);
+        });
+        console.log(
+          `Has a solution for ${findHouse.title} using the knights:`,
+          battleSolution.knights
+        );
+
+        battlesSolutions.push(battleSolution);
+      }
     }
 
     // Remove ponto atual do openSet.
@@ -162,16 +202,16 @@ function search() {
     closedSet.push(currentPoint);
 
     // Captura vizinhos do ponto atual.
-    let neighbors = currentPoint.neighbors;
+    const { neighbors } = currentPoint;
 
     // Irá iterar todos os vizinhos do ponto atual, mapeando informações do mesmo, e os inserindo no openSet para que possam ser visitados.
-    for (let i = 0; i < neighbors.length; i++) {
-      let neighbor = neighbors[i];
+    for (let i = 0; i < neighbors.length; i += 1) {
+      const neighbor = neighbors[i];
 
       // Entra no IF caso o array closedSet não tenha esse vizinho ainda (para evitar looping).
       if (!closedSet.includes(neighbor)) {
         // Define (ou redefine) um possível novo G para esse vizinho.
-        let possibleNewG = currentPoint.g + neighbor.f + neighbor.cost;
+        const possibleNewG = currentPoint.g + neighbor.f + neighbor.cost;
 
         // Adiciona o vizinho no array openSet, caso ainda não tenha o mesmo.
         if (!openSet.includes(neighbor)) {
@@ -191,7 +231,7 @@ function search() {
 
   // Valor default, caso não tenha encontrado solução.
   return [];
-};
+}
 
 generateRandomPath();
 
