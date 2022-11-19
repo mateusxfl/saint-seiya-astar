@@ -201,6 +201,7 @@ function search() {
         console.log(
           `Has a solution for ${findHouse.title} using the knights:`,
           battleSolution.knights,
+          `and it took ${battleSolution.time}m`,
         );
 
         battlesSolutions.push(battleSolution);
