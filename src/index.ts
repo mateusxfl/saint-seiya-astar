@@ -1,5 +1,4 @@
 import fs from 'fs';
-import Knight from './models/Knight';
 
 import defaultMap from './config/defaultMap';
 import GridPoint from './models/GridPoint';
@@ -59,6 +58,15 @@ const houses = [
 ];
 
 const battlesSolutions: BattleSolution[] = [];
+
+function getTimeAverage() {
+  const AMOUNT_TO_DECREASE = 25;
+  const housesDifficultyAverage =
+    houses.reduce((acc, item) => acc + item.difficulty, 0) / 12;
+  const knightsPowerAverage = squad.getPowerAverage();
+
+  return housesDifficultyAverage / knightsPowerAverage - AMOUNT_TO_DECREASE;
+}
 
 // A heurística que usaremos será a distância de Manhattan.
 function heuristic(position0: GridPoint, position1: GridPoint) {
@@ -189,9 +197,10 @@ function search() {
     );
 
     if (findHouse) {
+      const maxTimeByBattle = getTimeAverage();
       const availableKnights = squad.getAvailableKnightsToBattle();
 
-      const battle = new Battle(availableKnights, findHouse);
+      const battle = new Battle(availableKnights, findHouse, maxTimeByBattle);
       battle.searchBetterTeam();
 
       const solution = battle.getSolution();

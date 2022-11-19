@@ -10,10 +10,6 @@ class Squad {
     });
   }
 
-  public getKnights() {
-    return this.knights;
-  }
-
   public updateKnightsAfterBattle(choosedKnights: Knight[]) {
     const knightsIds = choosedKnights.map(item => item.id);
 
@@ -24,6 +20,16 @@ class Squad {
 
       return item;
     });
+  }
+
+  public getKnights() {
+    return this.knights;
+  }
+
+  public getPowerAverage() {
+    const powerTotal = this.knights.reduce((acc, item) => acc + item.power, 0);
+
+    return powerTotal / 5;
   }
 
   public getAvailableKnightsToBattle() {

@@ -3,11 +3,16 @@ import Knight from './Knight';
 import BattleSolution from './BattleSolution';
 
 import getCombinations from '../utils/combination';
+import { isValid } from '../utils/battle';
 
 class Battle {
-  private solution: BattleSolution | null = null;
+  private solutions: BattleSolution[] = [];
 
-  constructor(public knights: Knight[], public house: House) {}
+  constructor(
+    public knights: Knight[],
+    public house: House,
+    private maxTime: number,
+  ) {}
 
   public getTime(knights: Knight[]) {
     let powerAmount = 0;
@@ -30,7 +35,6 @@ class Battle {
   }
 
   public searchBetterTeam() {
-    const list: BattleSolution[] = [];
     const frontier: BattleSolution[] = [];
 
     const { powerByLife, time } = this.getTime(this.knights);
@@ -49,42 +53,41 @@ class Battle {
 
         for (const comb of knightsCombination) {
           const timeOfCombination = this.getTime(comb);
-          const solutionOfCombination = new BattleSolution(
+          const solution = isValid(
             comb,
-            timeOfCombination.time,
-            timeOfCombination.powerByLife,
+            this.solutions,
+            timeOfCombination,
+            this.maxTime,
           );
 
-          const isVisited = list.find(
-            item =>
-              JSON.stringify(item.knights) ===
-              JSON.stringify(solutionOfCombination.knights),
-          );
-
-          if (!isVisited && solutionOfCombination.time <= 39) {
-            list.push(solutionOfCombination);
-            frontier.push(solutionOfCombination);
+          if (solution) {
+            this.solutions.push(solution);
+            frontier.push(solution);
           }
         }
       }
     }
-
-    const orderedList = list.sort((a, b) => a.heuristic - b.heuristic);
-
-    this.solution = orderedList[orderedList.length - 1];
   }
 
   public getSolution() {
-    return this.solution?.knights ? this.solution : null;
+    const orderedSolutions = [...this.solutions].sort(
+      (a, b) => a.heuristic - b.heuristic,
+    );
+
+    return orderedSolutions.pop();
   }
 
   public printSolution() {
-    if (this.solution?.knights) {
+    const solution = this.getSolution();
+
+    if (solution?.knights) {
       console.table([
         {
           house: this.house.title,
-          knights: this.solution.knights.map(item => item.name).join(', '),
-          time: this.solution.time,
+          knights: solution.knights
+            .map(item => `${item.name} - ${item.life}`)
+            .join(', '),
+          time: solution.time,
         },
       ]);
     } else {
