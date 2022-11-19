@@ -9,16 +9,16 @@ class Battle {
 
   public getTime(knights: Knight[]) {
     let powerAmount = 0;
-    let powerByLife = 0;
+    const powerByLife = 0;
 
     knights.forEach((knight) => {
       powerAmount += knight.power;
 
-      if (knight.life < 5) {
+      /*  if (knight.life < 5) {
         powerByLife += knight.power * (5 - knight.life + 2);
       } else {
         powerByLife += knight.power;
-      }
+      } */
     });
 
     return {
