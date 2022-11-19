@@ -1,8 +1,8 @@
-import House from "./House";
-import Knight from "./Knight";
-import BattleSolution from "./BattleSolution";
+import House from './House';
+import Knight from './Knight';
+import BattleSolution from './BattleSolution';
 
-import getCombinations from "../utils/combination";
+import getCombinations from '../utils/combination';
 
 class Battle {
   constructor(public knights: Knight[], public house: House) {}
@@ -11,7 +11,7 @@ class Battle {
     let powerAmount = 0;
     const powerByLife = 0;
 
-    knights.forEach((knight) => {
+    knights.forEach(knight => {
       powerAmount += knight.power;
 
       /*  if (knight.life < 5) {
@@ -42,7 +42,7 @@ class Battle {
       if (v?.knightsTotal > 1) {
         const knightsCombination = getCombinations(
           v.knights,
-          v.knightsTotal - 1
+          v.knightsTotal - 1,
         );
 
         for (const comb of knightsCombination) {
@@ -50,7 +50,7 @@ class Battle {
           const solutionOfCombination = new BattleSolution(
             comb,
             timeOfCombination.time,
-            timeOfCombination.powerByLife
+            timeOfCombination.powerByLife,
           );
 
           list.push(solutionOfCombination);
@@ -59,9 +59,9 @@ class Battle {
       }
     }
 
-    const orderedList = list.sort((a, b) => a.heuristic - b.heuristic);
+    const orderedList = list.sort((a, b) => a.time - b.time);
 
-    return orderedList[0];
+    return orderedList[orderedList.length - 1];
   }
 }
 

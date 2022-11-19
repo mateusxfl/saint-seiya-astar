@@ -16,8 +16,10 @@
   },
   "rules": {
     "prettier/prettier": "error",
+    "class-methods-use-this": "off",
     "no-useless-constructor": "off",
     "no-restricted-syntax": "off",
+    "import/prefer-default-export": "off",
     "import/extensions": [
       "error",
       "ignorePackages",

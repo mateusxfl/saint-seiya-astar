@@ -1,11 +1,13 @@
-import fs from "fs";
-import Knight from "./models/Knight";
+import fs from 'fs';
+import Knight from './models/Knight';
 
-import defaultMap from "./config/defaultMap";
-import GridPoint from "./models/GridPoint";
-import House from "./models/House";
-import BattleSolution from "./models/BattleSolution";
-import Battle from "./models/Battle";
+import defaultMap from './config/defaultMap';
+import GridPoint from './models/GridPoint';
+import House from './models/House';
+import BattleSolution from './models/BattleSolution';
+import Battle from './models/Battle';
+import { KnightInfo } from './types';
+import Squad from './squad';
 
 const rows = defaultMap.length; // Total de linhas da grid.
 const cols = defaultMap[0].length; // Total de colunas da grid.
@@ -16,27 +18,44 @@ let start: GridPoint; // Ponto de partida.
 let end: GridPoint; // Ponto de destino.
 const path: GridPoint[] = []; // Array com o caminho traçado.
 
-const knights = [
-  new Knight(1.5, "seya.png"),
-  new Knight(1.4, "shiryu.png"),
-  new Knight(1.3, "hyoga.png"),
-  new Knight(1.2, "shun.png"),
-  new Knight(1.1, "ikki.png"),
+const squadInfo: KnightInfo[] = [
+  {
+    name: 'seya',
+    power: 1.5,
+  },
+  {
+    name: 'shiryu',
+    power: 1.4,
+  },
+  {
+    name: 'hyoga',
+    power: 1.3,
+  },
+  {
+    name: 'shun',
+    power: 1.2,
+  },
+  {
+    name: 'ikki',
+    power: 1.1,
+  },
 ];
 
+const squad = new Squad(squadInfo);
+
 const houses = [
-  new House(37, 21, 50, "Aries"),
-  new House(31, 17, 55, "Taurus"),
-  new House(31, 33, 60, "Gemini"),
-  new House(24, 26, 70, "Cancer"),
-  new House(24, 9, 75, "Leo"),
-  new House(17, 9, 80, "Virgo"),
-  new House(17, 29, 85, "Libra"),
-  new House(13, 37, 90, "Scorpius"),
-  new House(9, 27, 95, "Sagittarius"),
-  new House(9, 14, 100, "Capricornus"),
-  new House(4, 13, 110, "Aquarius"),
-  new House(4, 30, 120, "Pisces"),
+  new House(37, 21, 50, 'Aries'),
+  new House(31, 17, 55, 'Taurus'),
+  new House(31, 33, 60, 'Gemini'),
+  new House(24, 26, 70, 'Cancer'),
+  new House(24, 9, 75, 'Leo'),
+  new House(17, 9, 80, 'Virgo'),
+  new House(17, 29, 85, 'Libra'),
+  new House(13, 37, 90, 'Scorpius'),
+  new House(9, 27, 95, 'Sagittarius'),
+  new House(9, 14, 100, 'Capricornus'),
+  new House(4, 13, 110, 'Aquarius'),
+  new House(4, 30, 120, 'Pisces'),
 ];
 
 const battlesSolutions: BattleSolution[] = [];
@@ -111,20 +130,20 @@ function drawPath(finalPath: GridPoint[]) {
     defaultMap[finalPath[i].x][finalPath[i].y] += 6;
   }
 
-  let data = "[\n";
+  let data = '[\n';
   for (let i = 0; i < rows; i += 1) {
-    data += "\t[";
+    data += '\t[';
     for (let j = 0; j < cols; j += 1) {
       data += defaultMap[i][j];
       if (j + 1 !== cols) {
-        data += ",";
+        data += ',';
       }
     }
-    data += "],\n";
+    data += '],\n';
   }
-  data += "]";
+  data += ']';
 
-  fs.writeFile("./src/mapWithTracedPath.txt", data, (err) => {
+  fs.writeFile('./src/mapWithTracedPath.txt', data, err => {
     if (err) throw err;
   });
 }
@@ -158,37 +177,30 @@ function search() {
     // Função objetivo, verificando se o nó atende a condição de parada.
     if (currentPoint === end) {
       console.log(
-        "Função objetivo satisfeita, o menor caminho foi encontrado!!!"
+        'Função objetivo satisfeita, o menor caminho foi encontrado!!!',
       );
       return getFinalPath(currentPoint);
     }
 
     const findHouse = houses.find(
-      (house) =>
+      house =>
         house.position_x === currentPoint.x &&
-        house.position_y === currentPoint.y
+        house.position_y === currentPoint.y,
     );
 
     if (findHouse) {
-      const availableKnights = knights.filter((item) => item.life > 0);
+      const availableKnights = squad.getAvailableKnightsToBattle();
 
       const battleSolution = new Battle(availableKnights, findHouse).search();
 
       if (!battleSolution?.knights) {
         console.log(`No solution for ${findHouse.title}`);
       } else {
-        battleSolution.knights.forEach((knight) => {
-          const updatedKnight = knight;
-          updatedKnight.life -= 1;
-          const knightIndex = knights.findIndex(
-            (k) => k.image === knight.image
-          );
+        squad.updateKnightsAfterBattle(battleSolution.knights);
 
-          knights.splice(knightIndex, 1, updatedKnight);
-        });
         console.log(
           `Has a solution for ${findHouse.title} using the knights:`,
-          battleSolution.knights
+          battleSolution.knights,
         );
 
         battlesSolutions.push(battleSolution);
