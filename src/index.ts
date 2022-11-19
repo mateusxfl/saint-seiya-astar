@@ -191,20 +191,15 @@ function search() {
     if (findHouse) {
       const availableKnights = squad.getAvailableKnightsToBattle();
 
-      const battleSolution = new Battle(availableKnights, findHouse).search();
+      const battle = new Battle(availableKnights, findHouse);
+      battle.searchBetterTeam();
 
-      if (!battleSolution?.knights) {
-        console.log(`No solution for ${findHouse.title}`);
-      } else {
-        squad.updateKnightsAfterBattle(battleSolution.knights);
+      const solution = battle.getSolution();
+      battle.printSolution();
 
-        console.log(
-          `Has a solution for ${findHouse.title} using the knights:`,
-          battleSolution.knights,
-          `and it took ${battleSolution.time}m`,
-        );
-
-        battlesSolutions.push(battleSolution);
+      if (solution) {
+        squad.updateKnightsAfterBattle(solution.knights);
+        battlesSolutions.push(solution);
       }
     }
 

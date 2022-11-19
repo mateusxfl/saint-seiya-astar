@@ -17,6 +17,7 @@
   "rules": {
     "prettier/prettier": "error",
     "camelcase": "off",
+    "no-console": "off",
     "class-methods-use-this": "off",
     "no-useless-constructor": "off",
     "no-restricted-syntax": "off",

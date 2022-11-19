@@ -5,6 +5,8 @@ import BattleSolution from './BattleSolution';
 import getCombinations from '../utils/combination';
 
 class Battle {
+  private solution: BattleSolution | null = null;
+
   constructor(public knights: Knight[], public house: House) {}
 
   public getTime(knights: Knight[]) {
@@ -27,7 +29,7 @@ class Battle {
     };
   }
 
-  public search() {
+  public searchBetterTeam() {
     const list: BattleSolution[] = [];
     const frontier: BattleSolution[] = [];
 
@@ -59,7 +61,7 @@ class Battle {
               JSON.stringify(solutionOfCombination.knights),
           );
 
-          if (!isVisited) {
+          if (!isVisited && solutionOfCombination.time <= 39) {
             list.push(solutionOfCombination);
             frontier.push(solutionOfCombination);
           }
@@ -69,7 +71,31 @@ class Battle {
 
     const orderedList = list.sort((a, b) => a.heuristic - b.heuristic);
 
-    return orderedList[orderedList.length - 1];
+    this.solution = orderedList[orderedList.length - 1];
+  }
+
+  public getSolution() {
+    return this.solution?.knights ? this.solution : null;
+  }
+
+  public printSolution() {
+    if (this.solution?.knights) {
+      console.table([
+        {
+          house: this.house.title,
+          knights: this.solution.knights.map(item => item.name).join(', '),
+          time: this.solution.time,
+        },
+      ]);
+    } else {
+      console.table([
+        {
+          house: this.house.title,
+          knights: 'NO SOLUTION',
+          time: '---',
+        },
+      ]);
+    }
   }
 }
 
