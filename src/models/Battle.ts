@@ -9,16 +9,16 @@ class Battle {
 
   public getTime(knights: Knight[]) {
     let powerAmount = 0;
-    const powerByLife = 0;
+    let powerByLife = 0;
 
     knights.forEach(knight => {
       powerAmount += knight.power;
 
-      /*  if (knight.life < 5) {
+      if (knight.life < 5) {
         powerByLife += knight.power * (5 - knight.life + 2);
       } else {
         powerByLife += knight.power;
-      } */
+      }
     });
 
     return {
@@ -28,9 +28,9 @@ class Battle {
   }
 
   public search() {
-    const list = [];
-
+    const list: BattleSolution[] = [];
     const frontier: BattleSolution[] = [];
+
     const { powerByLife, time } = this.getTime(this.knights);
 
     const battleSolution = new BattleSolution(this.knights, time, powerByLife);
@@ -53,13 +53,21 @@ class Battle {
             timeOfCombination.powerByLife,
           );
 
-          list.push(solutionOfCombination);
-          frontier.push(solutionOfCombination);
+          const isVisited = list.find(
+            item =>
+              JSON.stringify(item.knights) ===
+              JSON.stringify(solutionOfCombination.knights),
+          );
+
+          if (!isVisited) {
+            list.push(solutionOfCombination);
+            frontier.push(solutionOfCombination);
+          }
         }
       }
     }
 
-    const orderedList = list.sort((a, b) => a.time - b.time);
+    const orderedList = list.sort((a, b) => a.heuristic - b.heuristic);
 
     return orderedList[orderedList.length - 1];
   }
