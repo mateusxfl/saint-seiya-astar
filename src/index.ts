@@ -2,11 +2,6 @@ import fs from 'fs';
 
 import defaultMap from './config/defaultMap';
 import GridPoint from './models/GridPoint';
-import House from './models/House';
-import BattleSolution from './models/BattleSolution';
-import Battle from './models/Battle';
-import { KnightInfo } from './types';
-import Squad from './squad';
 
 const rows = defaultMap.length; // Total de linhas da grid.
 const cols = defaultMap[0].length; // Total de colunas da grid.
@@ -16,57 +11,6 @@ const closedSet: GridPoint[] = []; // Array contendo pontos da grid já visitado
 let start: GridPoint; // Ponto de partida.
 let end: GridPoint; // Ponto de destino.
 const path: GridPoint[] = []; // Array com o caminho traçado.
-
-const squadInfo: KnightInfo[] = [
-  {
-    name: 'seya',
-    power: 1.5,
-  },
-  {
-    name: 'shiryu',
-    power: 1.4,
-  },
-  {
-    name: 'hyoga',
-    power: 1.3,
-  },
-  {
-    name: 'shun',
-    power: 1.2,
-  },
-  {
-    name: 'ikki',
-    power: 1.1,
-  },
-];
-
-const squad = new Squad(squadInfo);
-
-const houses = [
-  new House(37, 21, 50, 'Aries'),
-  new House(31, 17, 55, 'Taurus'),
-  new House(31, 33, 60, 'Gemini'),
-  new House(24, 26, 70, 'Cancer'),
-  new House(24, 9, 75, 'Leo'),
-  new House(17, 9, 80, 'Virgo'),
-  new House(17, 29, 85, 'Libra'),
-  new House(13, 37, 90, 'Scorpius'),
-  new House(9, 27, 95, 'Sagittarius'),
-  new House(9, 14, 100, 'Capricornus'),
-  new House(4, 13, 110, 'Aquarius'),
-  new House(4, 30, 120, 'Pisces'),
-];
-
-const battlesSolutions: BattleSolution[] = [];
-
-function getTimeAverage() {
-  const AMOUNT_TO_DECREASE = 25;
-  const housesDifficultyAverage =
-    houses.reduce((acc, item) => acc + item.difficulty, 0) / 12;
-  const knightsPowerAverage = squad.getPowerAverage();
-
-  return housesDifficultyAverage / knightsPowerAverage - AMOUNT_TO_DECREASE;
-}
 
 // A heurística que usaremos será a distância de Manhattan.
 function heuristic(position0: GridPoint, position1: GridPoint) {
@@ -190,28 +134,6 @@ function search() {
       return getFinalPath(currentPoint);
     }
 
-    const findHouse = houses.find(
-      house =>
-        house.position_x === currentPoint.x &&
-        house.position_y === currentPoint.y,
-    );
-
-    if (findHouse) {
-      const maxTimeByBattle = getTimeAverage();
-      const availableKnights = squad.getAvailableKnightsToBattle();
-
-      const battle = new Battle(availableKnights, findHouse, maxTimeByBattle);
-      battle.searchBetterTeam();
-
-      const solution = battle.getSolution();
-      battle.printSolution();
-
-      if (solution) {
-        squad.updateKnightsAfterBattle(solution.knights);
-        battlesSolutions.push(solution);
-      }
-    }
-
     // Remove ponto atual do openSet.
     openSet.splice(indexOfLowestFx, 1);
 
@@ -253,10 +175,3 @@ function search() {
 generateRandomPath();
 
 drawPath(search());
-
-const totalBattleTime = battlesSolutions.reduce(
-  (acc, item) => acc + item.time,
-  0,
-);
-
-console.log(`Tempo total das batalhas: ${totalBattleTime / 60}`);

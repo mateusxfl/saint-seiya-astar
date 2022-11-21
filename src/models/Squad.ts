@@ -1,11 +1,11 @@
-import { KnightInfo } from 'types';
-import Knight from './models/Knight';
+import { KnightInfo } from '../types';
+import Knight from './Knight';
 
 class Squad {
   private knights: Knight[] = [];
 
-  constructor(knightInfo: KnightInfo[]) {
-    knightInfo.forEach(({ name, power, life = 5 }) => {
+  constructor(squadKnights: KnightInfo[]) {
+    squadKnights.forEach(({ name, power, life = 5 }) => {
       this.knights.push(new Knight(name, power, life));
     });
   }

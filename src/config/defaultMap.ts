@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * 0  -> Terreno montanhoso, + 200 minutos.
  * 1  -> Terreno plano,      + 1 minuto.

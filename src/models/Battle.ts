@@ -1,12 +1,11 @@
 import House from './House';
 import Knight from './Knight';
-import BattleSolution from './BattleSolution';
+import BattleTeam from './BattleTeam';
 
 import getCombinations from '../utils/combination';
-import { isValid } from '../utils/battle';
 
 class Battle {
-  private solutions: BattleSolution[] = [];
+  private solutions: BattleTeam[] = [];
 
   constructor(
     public knights: Knight[],
@@ -34,16 +33,46 @@ class Battle {
     };
   }
 
+  public isValidBattleTeam(
+    comb: Knight[],
+    list: BattleTeam[],
+    timeOfCombination: { time: number; powerByLife: number },
+  ) {
+    if (timeOfCombination.time > this.maxTime) return false;
+
+    const solutionOfCombination = new BattleTeam(
+      comb,
+      this.house,
+      timeOfCombination.time,
+      timeOfCombination.powerByLife,
+    );
+
+    const isVisited = list.find(
+      item =>
+        JSON.stringify(item.knights) ===
+        JSON.stringify(solutionOfCombination.knights),
+    );
+
+    if (isVisited) return false;
+
+    return solutionOfCombination;
+  }
+
   public searchBetterTeam() {
-    const frontier: BattleSolution[] = [];
+    const frontier: BattleTeam[] = [];
 
     const { powerByLife, time } = this.getTime(this.knights);
 
-    const battleSolution = new BattleSolution(this.knights, time, powerByLife);
+    const battleSolution = new BattleTeam(
+      this.knights,
+      this.house,
+      time,
+      powerByLife,
+    );
     frontier.push(battleSolution);
 
     while (frontier.length > 0) {
-      const v = frontier.pop() || ({} as BattleSolution);
+      const v = frontier.pop() || ({} as BattleTeam);
 
       if (v?.knightsTotal > 1) {
         const knightsCombination = getCombinations(
@@ -53,11 +82,10 @@ class Battle {
 
         for (const comb of knightsCombination) {
           const timeOfCombination = this.getTime(comb);
-          const solution = isValid(
+          const solution = this.isValidBattleTeam(
             comb,
             this.solutions,
             timeOfCombination,
-            this.maxTime,
           );
 
           if (solution) {
@@ -75,30 +103,6 @@ class Battle {
     );
 
     return orderedSolutions.pop();
-  }
-
-  public printSolution() {
-    const solution = this.getSolution();
-
-    if (solution?.knights) {
-      console.table([
-        {
-          house: this.house.title,
-          knights: solution.knights
-            .map(item => `${item.name} - ${item.life}`)
-            .join(', '),
-          time: solution.time,
-        },
-      ]);
-    } else {
-      console.table([
-        {
-          house: this.house.title,
-          knights: 'NO SOLUTION',
-          time: '---',
-        },
-      ]);
-    }
   }
 }
 
