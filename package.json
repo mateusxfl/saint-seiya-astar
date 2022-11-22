@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules ./src/index.ts",
-    "battle": "ts-node ./src/saintBattles.ts"
+    "battle": "ts-node ./src/saintBattles.ts",
+    "path": "ts-node ./src/models/SearchPath.ts"
   },
   "author": "Mateus Fonseca",
   "license": "ISC",
