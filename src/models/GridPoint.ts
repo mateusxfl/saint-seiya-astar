@@ -37,7 +37,7 @@ class GridPoint {
   }
 
   public updateNeighbors(grid: Array<any>, rows: number, columns: number) {
-    const { row, column } = this; // col i || line j
+    const { row, column } = this;
 
     // Vizinho de baixo.
     if (row < rows - 1) this.neighbors.push(grid[row + 1][column]);

@@ -212,6 +212,4 @@ class SearchPath {
   }
 }
 
-const isRandomMap = false;
-const searchPath = new SearchPath(isRandomMap);
-searchPath.execute();
+export default SearchPath;
