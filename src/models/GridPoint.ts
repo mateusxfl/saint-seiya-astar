@@ -1,8 +1,8 @@
 /* eslint-disable no-use-before-define */
 class GridPoint {
-  public x: number;
+  public row: number;
 
-  public y: number;
+  public column: number;
 
   public f: number;
 
@@ -16,9 +16,9 @@ class GridPoint {
 
   public parent: GridPoint | undefined;
 
-  constructor(x: number, y: number, ground: number) {
-    this.x = x; // Coluna do ponto.
-    this.y = y; // Linha do ponto.
+  constructor(row: number, column: number, ground: number) {
+    this.row = row; // Linha do ponto.
+    this.column = column; // Coluna do ponto.
     this.f = 0; // F(x) Função de custo.
     this.g = 0; // G(x) Soma do custo dos caminhos até o ponto atual.
     this.h = 0; // H(X) Custo estimado até o ponto final.
@@ -27,34 +27,29 @@ class GridPoint {
     this.parent = undefined; // Pai do do ponto atual.
 
     // Define um custo para atravessar esse terreno, com base no tipo do terreno.
-    if (ground == 0) {
+    if (ground === 0) {
       this.cost = 200;
-    } else if (ground == 1) {
+    } else if (ground === 1) {
       this.cost = 1;
-    } else if (ground == 2) {
+    } else if (ground === 2) {
       this.cost = 5;
     }
   }
 
-  public updateNeighbors(grid: Array<any>, cols: number, rows: number) {
-    const i = this.x;
-    const j = this.y;
+  public updateNeighbors(grid: Array<any>, rows: number, columns: number) {
+    const { row, column } = this; // col i || line j
 
-    if (i < cols - 1) {
-      this.neighbors.push(grid[i + 1][j]);
-    }
+    // Vizinho de baixo.
+    if (row < rows - 1) this.neighbors.push(grid[row + 1][column]);
 
-    if (i > 0) {
-      this.neighbors.push(grid[i - 1][j]);
-    }
+    // Vizinho de cima.
+    if (row > 0) this.neighbors.push(grid[row - 1][column]);
 
-    if (j < rows - 1) {
-      this.neighbors.push(grid[i][j + 1]);
-    }
+    // Vizinho da direita.
+    if (column < columns - 1) this.neighbors.push(grid[row][column + 1]);
 
-    if (j > 0) {
-      this.neighbors.push(grid[i][j - 1]);
-    }
+    // Vizinho da esquerda.
+    if (column > 0) this.neighbors.push(grid[row][column - 1]);
   }
 }
 

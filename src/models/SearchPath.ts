@@ -38,10 +38,10 @@ class SearchPath {
     this.openSet.push(this.start);
   }
 
-  // A heurística que usaremos será a distância de Manhattan.
-  public heuristic(position0: GridPoint, position1: GridPoint) {
-    const d1 = Math.abs(position1.x - position0.x);
-    const d2 = Math.abs(position1.y - position0.y);
+  // A heurística que usaremos será a distância de Manhattan (Distância em linha "reta" entre dois pontos).
+  public heuristic(start: GridPoint, end: GridPoint) {
+    const d1 = Math.abs(end.row - start.row);
+    const d2 = Math.abs(end.column - start.column);
 
     return d1 + d2;
   }
@@ -96,7 +96,7 @@ class SearchPath {
   // Imprime a matriz (mapa) com o caminho encontrado.
   public drawPath(finalPath: GridPoint[]) {
     for (let i = 0; i < finalPath.length; i += 1) {
-      defaultMap[finalPath[i].x][finalPath[i].y] += 6;
+      defaultMap[finalPath[i].row][finalPath[i].column] += 6;
     }
 
     let data = '[\n';
@@ -185,8 +185,8 @@ class SearchPath {
 
     tracedPath.forEach((point, i) => {
       solutions.push({
-        line: point.x,
-        column: point.y,
+        row: point.row,
+        column: point.column,
         f: point.f,
         g: point.g,
         h: point.h,
