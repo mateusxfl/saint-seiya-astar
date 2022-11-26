@@ -72,7 +72,10 @@ class SearchPath {
   public getIndexOfLowestFxInOpenSet() {
     let indexOfLowestFx = 0;
     for (let i = 0; i < this.openSet.length; i += 1) {
-      if (this.openSet[i].f < this.openSet[indexOfLowestFx].f) {
+      if (
+        this.openSet[i].costFunction <
+        this.openSet[indexOfLowestFx].costFunction
+      ) {
         indexOfLowestFx = i;
       }
     }
@@ -157,20 +160,22 @@ class SearchPath {
         // Entra no IF caso o array closedSet não tenha esse vizinho ainda (para evitar looping).
         if (!this.closedSet.includes(neighbor)) {
           // Define (ou redefine) um possível novo G para esse vizinho.
-          const possibleNewG = currentPoint.g + neighbor.f + neighbor.cost;
+          const possibleNewPathCost =
+            currentPoint.pathCost + neighbor.costFunction + neighbor.cost;
 
           // Adiciona o vizinho no array openSet, caso ainda não tenha o mesmo.
           if (!this.openSet.includes(neighbor)) {
             this.openSet.push(neighbor);
-          } else if (possibleNewG >= neighbor.g) {
+          } else if (possibleNewPathCost >= neighbor.pathCost) {
             // eslint-disable-next-line no-continue
             continue;
           }
 
           // Caso esse vizinho tenha sido adicionado agora em openSet, ou openSet já tenha esse vizinho, porém com custo maior, o mapearemos com os novos dados.
-          neighbor.g = possibleNewG;
-          neighbor.h = this.heuristic(neighbor, this.end);
-          neighbor.f = neighbor.g + neighbor.h + neighbor.cost;
+          neighbor.pathCost = possibleNewPathCost;
+          neighbor.heuristic = this.heuristic(neighbor, this.end);
+          neighbor.costFunction =
+            neighbor.pathCost + neighbor.heuristic + neighbor.cost;
           neighbor.parent = currentPoint;
         }
       }
@@ -187,11 +192,11 @@ class SearchPath {
       solutions.push({
         row: point.row,
         column: point.column,
-        f: point.f,
-        g: point.g,
-        h: point.h,
+        costFunction: point.costFunction,
+        pathCost: point.pathCost,
+        heuristic: point.heuristic,
         cost: point.cost,
-        time: this.minuteToHours(point.g),
+        time: this.minuteToHours(point.pathCost),
       });
     });
 

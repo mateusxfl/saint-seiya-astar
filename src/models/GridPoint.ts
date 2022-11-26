@@ -4,11 +4,11 @@ class GridPoint {
 
   public column: number;
 
-  public f: number;
+  public costFunction: number;
 
-  public g: number;
+  public pathCost: number;
 
-  public h: number;
+  public heuristic: number;
 
   public cost: number;
 
@@ -19,9 +19,9 @@ class GridPoint {
   constructor(row: number, column: number, ground: number) {
     this.row = row; // Linha do ponto.
     this.column = column; // Coluna do ponto.
-    this.f = 0; // F(x) Função de custo.
-    this.g = 0; // G(x) Soma do custo dos caminhos até o ponto atual.
-    this.h = 0; // H(X) Custo estimado até o ponto final.
+    this.costFunction = 0; // F(x) Função de custo.
+    this.pathCost = 0; // G(x) Soma do custo dos caminhos até o ponto atual.
+    this.heuristic = 0; // H(X) Custo estimado até o ponto final.
     this.cost = 0; // Custo para atravessar no terreno.
     this.neighbors = []; // Vizinhos do ponto atual.
     this.parent = undefined; // Pai do do ponto atual.
