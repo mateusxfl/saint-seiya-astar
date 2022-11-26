@@ -1,7 +1,7 @@
 import { KnightInfo } from 'types';
 
 import SaintBattles from './saintBattles';
-import SearchPath from './models/SearchPath';
+import SearchPath from './searchPath';
 
 function execute(
   squadInfo: KnightInfo[],

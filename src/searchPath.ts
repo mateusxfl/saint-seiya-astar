@@ -1,5 +1,5 @@
-import defaultMap from '../config/defaultMap';
-import GridPoint from './GridPoint';
+import defaultMap from './config/defaultMap';
+import GridPoint from './models/GridPoint';
 
 class SearchPath {
   private rows: number; // Total de linhas da grid.
