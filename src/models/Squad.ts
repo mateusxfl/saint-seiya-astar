@@ -32,8 +32,18 @@ class Squad {
     return powerTotal / 5;
   }
 
+  public getMostPowerfulKnight() {
+    return this.getAvailableKnightsToBattle().sort(
+      (a, b) => b.power - a.power,
+    )[0];
+  }
+
   public getAvailableKnightsToBattle() {
     return this.knights.filter(knight => knight.isAvailableToBattle());
+  }
+
+  public hasAvailableKnights() {
+    return this.getAvailableKnightsToBattle().length > 0;
   }
 }
 

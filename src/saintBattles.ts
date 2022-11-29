@@ -1,7 +1,6 @@
 import { KnightInfo } from 'types';
 
 import Battle from './models/Battle';
-import BattleTeam from './models/BattleTeam';
 import House from './models/House';
 import Sanctuary from './models/Sanctuary';
 import Squad from './models/Squad';
@@ -13,44 +12,38 @@ class SaintBattles {
 
   private sanctuary: Sanctuary;
 
-  private battles: BattleTeam[] = [];
+  private battles: Battle[] = [];
 
   constructor(squadKnights: KnightInfo[], housesDifficulty: number[] = []) {
     this.squad = new Squad(squadKnights);
     this.sanctuary = new Sanctuary(housesDifficulty);
 
     this.houses = this.sanctuary.getHouses();
+    this.populateBattles();
   }
 
-  private getTimeAverage() {
-    const AMOUNT_TO_DECREASE = 25;
-    const housesDifficultyAverage =
-      this.houses.reduce((acc, item) => acc + item.difficulty, 0) / 12;
-    const knightsPowerAverage = this.squad.getPowerAverage();
+  private populateBattles() {
+    const houses = [...this.houses].sort((a, b) => b.difficulty - a.difficulty);
 
-    return housesDifficultyAverage / knightsPowerAverage - AMOUNT_TO_DECREASE;
+    this.battles = houses.map(house => new Battle(house));
   }
 
   public startBattles() {
-    this.houses.forEach(house => {
-      const maxTimeByBattle = this.getTimeAverage();
-      const availableKnights = this.squad.getAvailableKnightsToBattle();
+    while (this.squad.hasAvailableKnights()) {
+      this.battles.forEach(battle => {
+        const mostPowerfulKnight = this.squad.getMostPowerfulKnight();
 
-      const battle = new Battle(availableKnights, house, maxTimeByBattle);
-      battle.searchBetterTeam();
-
-      const solution = battle.getSolution();
-
-      if (solution) {
-        this.squad.updateKnightsAfterBattle(solution.knights);
-        this.battles.push(solution);
-      }
-    });
+        if (mostPowerfulKnight) {
+          battle.addKnight(mostPowerfulKnight);
+          mostPowerfulKnight.decreaseLife();
+        }
+      });
+    }
   }
 
   public getTime() {
     const totalBattleTime = this.battles.reduce(
-      (acc, item) => acc + item.time,
+      (acc, item) => acc + item.getTime(),
       0,
     );
 
@@ -64,13 +57,14 @@ class SaintBattles {
   public printSolutions() {
     const solutions: any[] = [];
 
-    this.houses.forEach((house, i) => {
-      const battleForHouse = this.battles[i];
-      if (battleForHouse) {
-        solutions.push(battleForHouse.getTeamInfo());
+    this.battles.sort((a, b) => a.house.difficulty - b.house.difficulty);
+
+    this.battles.forEach(battle => {
+      if (battle.getKnightsTeam().length) {
+        solutions.push(battle.getTeamInfo());
       } else {
         solutions.push({
-          house: house.title,
+          house: battle.house.title,
           knights: 'NO SOLUTION',
           time: 0,
         });
