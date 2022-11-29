@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Container } from './GridPoint.styles';
 
 export interface GridPointProps {
@@ -29,4 +29,4 @@ const GridPoint: React.FC<GridPointProps> = ({
   );
 };
 
-export default GridPoint;
+export default memo(GridPoint);
