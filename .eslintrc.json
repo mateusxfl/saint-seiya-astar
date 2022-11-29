@@ -21,12 +21,14 @@
     "class-methods-use-this": "off",
     "no-useless-constructor": "off",
     "no-restricted-syntax": "off",
+    "no-restricted-exports": "off",
     "import/prefer-default-export": "off",
     "import/extensions": [
       "error",
       "ignorePackages",
       {
-        "ts": "never"
+        "ts": "never",
+        "tsx": "never"
       }
     ]
   },

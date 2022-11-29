@@ -1,4 +1,4 @@
-import defaultMap from './config/defaultMap';
+import { defaultMap } from './config/defaultMap';
 import GridPoint from './models/GridPoint';
 
 class SearchPath {
@@ -200,7 +200,7 @@ class SearchPath {
       });
     });
 
-    console.table(solutions);
+    console.log(solutions);
   }
 
   public minuteToHours(totalMinutes: number) {

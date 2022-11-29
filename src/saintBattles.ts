@@ -1,4 +1,4 @@
-import { KnightInfo } from 'types';
+import { KnightInfo } from './types';
 
 import Battle from './models/Battle';
 import House from './models/House';

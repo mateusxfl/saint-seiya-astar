@@ -1,4 +1,4 @@
-import { KnightInfo } from 'types';
+import { KnightInfo } from './types';
 
 import SaintBattles from './saintBattles';
 import SearchPath from './searchPath';
