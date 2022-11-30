@@ -5,8 +5,8 @@ export const Container = styled.div<GridPointProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 22px;
-  width: 22px;
+  height: calc(100vh / 42);
+  width: calc(100vh / 42);
   border: 1px solid #333;
 
   &[type='montain'] {

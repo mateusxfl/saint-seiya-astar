@@ -20,18 +20,18 @@ class Sanctuary {
     ] = housesDifficulty;
 
     const houses = [
-      new House(37, 21, ariesDiff, 'Aries'),
-      new House(31, 17, taurusDiff, 'Taurus'),
-      new House(31, 33, geminiDiff, 'Gemini'),
-      new House(24, 26, cancerDiff, 'Cancer'),
-      new House(24, 9, leoDiff, 'Leo'),
-      new House(17, 9, virgoDiff, 'Virgo'),
-      new House(17, 29, libraDiff, 'Libra'),
-      new House(13, 37, scorpiusDiff, 'Scorpius'),
-      new House(9, 27, sagittariusDiff, 'Sagittarius'),
-      new House(9, 14, capricornusDiff, 'Capricornus'),
-      new House(4, 13, aquariusDiff, 'Aquarius'),
-      new House(4, 30, piscesDiff, 'Pisces'),
+      new House(21, 37, ariesDiff, 'Aries'),
+      new House(17, 31, taurusDiff, 'Taurus'),
+      new House(33, 31, geminiDiff, 'Gemini'),
+      new House(26, 24, cancerDiff, 'Cancer'),
+      new House(9, 24, leoDiff, 'Leo'),
+      new House(9, 17, virgoDiff, 'Virgo'),
+      new House(29, 17, libraDiff, 'Libra'),
+      new House(37, 13, scorpiusDiff, 'Scorpius'),
+      new House(27, 9, sagittariusDiff, 'Sagittarius'),
+      new House(14, 9, capricornusDiff, 'Capricornus'),
+      new House(13, 4, aquariusDiff, 'Aquarius'),
+      new House(30, 4, piscesDiff, 'Pisces'),
     ];
 
     this.houses = houses;

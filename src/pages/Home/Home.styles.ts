@@ -1,19 +1,25 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  padding: 0 2rem;
   display: flex;
 
-  .grid {
+  .game-info {
     display: flex;
     flex-direction: column;
-  }
 
-  .row {
-    display: flex;
-  }
-
-  .actions {
+    flex: 1;
     padding: 20px;
+    background-image: url('../../../assets/utils/background.jpg');
+
+    .time {
+      span {
+        font-size: 22px;
+        color: #fff;
+
+        b {
+          font-size: 26px;
+        }
+      }
+    }
   }
 `;
