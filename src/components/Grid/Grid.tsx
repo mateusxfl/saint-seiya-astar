@@ -224,10 +224,6 @@ const Grid: React.FC<GridProps> = ({
     };
   }, [pathSolution, isStarted, actualIndex, gameSpeed]);
 
-  useEffect(() => {
-    console.log(timeOfBattles);
-  }, [timeOfBattles]);
-
   return (
     <Container>
       {defaultMap.map((row, y) => (
