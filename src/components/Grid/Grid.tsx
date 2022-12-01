@@ -1,4 +1,11 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FiPlay, FiPause } from 'react-icons/fi';
 
 import { defaultMap, getType } from '../../config/defaultMap';
@@ -13,6 +20,7 @@ import { Container } from './Grid.styles';
 interface GridProps {
   setActualBattle(battle: Battle | null): void;
   updateKnightsLifes(battle: Battle): void;
+  restoreKnights(): void;
   setTime(time: { hours: number; minutes: number }): void;
 }
 
@@ -25,18 +33,30 @@ const Grid: React.FC<GridProps> = ({
   setActualBattle,
   setTime,
   updateKnightsLifes,
+  restoreKnights,
 }) => {
+  const gameInterval = useRef<NodeJS.Timeout | null>(null);
   const [gameSpeed, setGameSpeed] = useState(1);
   const [isStarted, setIsStarted] = useState(false);
   const [actualIndex, setActualIndex] = useState(0);
   const [pathSolution, setPathSolution] = useState<any>([]);
   const [battlesSolutions, setBattlesSolutions] = useState<Battle[]>();
   const [visitedPoints, setVisitedPoints] = useState<GridPoint[]>([]);
+  const [timeOfBattles, setTimeOfBattles] = useState(0);
+
+  const destination = useMemo(
+    () => ({
+      x: 37,
+      y: 4,
+    }),
+    [],
+  );
 
   const audio = useMemo(
     () => new Audio('../../../assets/songs/PegasusFantasy.mp3'),
     [],
   );
+
   const actualPoint = useMemo(
     () => visitedPoints[visitedPoints.length - 1],
     [visitedPoints],
@@ -54,6 +74,16 @@ const Grid: React.FC<GridProps> = ({
     return 'Start';
   }, [isStarted, actualIndex]);
 
+  function updateTime(hours: number, minutes: number) {
+    const minutesWithTimeOfBattle = minutes + timeOfBattles;
+    const date = new Date(0, 0, 0, hours, minutesWithTimeOfBattle);
+
+    setTime({
+      hours: date.getHours(),
+      minutes: date.getMinutes(),
+    });
+  }
+
   function isActualPoint(column: number, row: number) {
     return row === actualPoint?.y && column === actualPoint?.x;
   }
@@ -64,14 +94,80 @@ const Grid: React.FC<GridProps> = ({
     );
   }
 
-  function handleOnChangeSpeed(value: number) {
-    setGameSpeed(value);
-  }
+  const isTheDestination = useCallback(
+    (row: number, column: number) =>
+      row === destination.y && column === destination.x,
+    [destination],
+  );
+
+  const finishGame = useCallback(() => {
+    audio.pause();
+    setActualIndex(0);
+    setGameSpeed(1);
+    setVisitedPoints([]);
+    setIsStarted(false);
+    setTimeOfBattles(0);
+    restoreKnights();
+
+    if (gameInterval.current) clearInterval(gameInterval.current);
+  }, [audio]);
+
+  const processBattle = useCallback(
+    (battle: Battle) => {
+      setTimeOfBattles(oldTime => oldTime + battle.getTime());
+      setActualBattle(battle);
+
+      updateKnightsLifes(battle);
+
+      setTimeout(() => {
+        setActualIndex(actualIndex + 1);
+        setActualBattle(null);
+      }, 2000);
+    },
+    [actualIndex, updateKnightsLifes, setActualBattle],
+  );
+
+  const processGameClock = useCallback(() => {
+    const gridPoint = pathSolution[actualIndex];
+    const {
+      row,
+      column,
+      time: { hours, minutes },
+    } = gridPoint;
+
+    const battle = isABattle(column, row);
+
+    setVisitedPoints(oldState => [
+      ...oldState,
+      {
+        x: column,
+        y: row,
+      },
+    ]);
+
+    if (battle) {
+      processBattle(battle);
+    } else {
+      setActualIndex(actualIndex + 1);
+    }
+
+    updateTime(hours, minutes);
+
+    if (isTheDestination(row, column)) {
+      finishGame();
+    }
+  }, [pathSolution, isStarted, actualIndex, gameSpeed]);
 
   const startAnimation = useCallback(() => {
-    // audio.play();
+    audio.play();
     setIsStarted(true);
-  }, [audio]);
+
+    if (pathSolution) {
+      gameInterval.current = setTimeout(() => {
+        processGameClock();
+      }, 300 / gameSpeed);
+    }
+  }, [audio, pathSolution, gameSpeed]);
 
   const stopAnimation = useCallback(() => {
     audio.pause();
@@ -117,55 +213,20 @@ const Grid: React.FC<GridProps> = ({
   }, []);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
     if (pathSolution && isStarted) {
-      timeout = setTimeout(() => {
-        const gridPoint = pathSolution[actualIndex];
-        const {
-          row,
-          column,
-          time: { hours, minutes },
-        } = gridPoint;
-
-        setTime({ hours, minutes });
-        const battle = isABattle(column, row);
-
-        if (battle) {
-          setActualBattle(battle);
-
-          setVisitedPoints(oldState => [
-            ...oldState,
-            {
-              x: column,
-              y: row,
-            },
-          ]);
-
-          updateKnightsLifes(battle);
-
-          setTimeout(() => {
-            setActualIndex(actualIndex + 1);
-            setActualBattle(null);
-          }, 2000);
-        } else {
-          setVisitedPoints(oldState => [
-            ...oldState,
-            {
-              x: column,
-              y: row,
-            },
-          ]);
-
-          setActualIndex(actualIndex + 1);
-        }
-      }, 400 / gameSpeed);
+      gameInterval.current = setTimeout(() => {
+        processGameClock();
+      }, 300 / gameSpeed);
     }
 
     return () => {
-      if (timeout) clearTimeout(timeout);
+      if (gameInterval.current) clearTimeout(gameInterval.current);
     };
   }, [pathSolution, isStarted, actualIndex, gameSpeed]);
+
+  useEffect(() => {
+    console.log(timeOfBattles);
+  }, [timeOfBattles]);
 
   return (
     <Container>

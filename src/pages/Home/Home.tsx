@@ -13,29 +13,32 @@ type Time = {
   minutes: number;
 };
 
+const DEFAULT_TEAM: Omit<KnightInfo, 'power'>[] = [
+  {
+    name: 'seiya',
+    life: 5,
+  },
+  {
+    name: 'shiryu',
+    life: 5,
+  },
+  {
+    name: 'hyoga',
+    life: 5,
+  },
+  {
+    name: 'shun',
+    life: 5,
+  },
+  {
+    name: 'ikki',
+    life: 5,
+  },
+];
+
 export default function Home() {
-  const [knightsTeam, setKnightsTeam] = useState<Omit<KnightInfo, 'power'>[]>([
-    {
-      name: 'seiya',
-      life: 5,
-    },
-    {
-      name: 'shiryu',
-      life: 5,
-    },
-    {
-      name: 'hyoga',
-      life: 5,
-    },
-    {
-      name: 'shun',
-      life: 5,
-    },
-    {
-      name: 'ikki',
-      life: 5,
-    },
-  ]);
+  const [knightsTeam, setKnightsTeam] =
+    useState<Omit<KnightInfo, 'power'>[]>(DEFAULT_TEAM);
   const [time, setTime] = useState<Time>({ hours: 0, minutes: 0 });
   const [actualBattle, setActualBattle] = useState<Battle | null>(null);
 
@@ -45,13 +48,6 @@ export default function Home() {
 
     return `${parsedHours}:${parsedMinutes}`;
   }, [time]);
-
-  // const updateTime = useCallback((hours: number, minutes: number) => {
-  //   setTime(oldState => ({
-  //     hours: oldState.hours + hours,
-  //     minutes: oldState.minutes + minutes,
-  //   }));
-  // }, []);
 
   const updateKnightsLifes = useCallback((battle: Battle) => {
     const team = battle.getKnightsTeam().map(item => item.name) as string[];
@@ -68,11 +64,14 @@ export default function Home() {
     });
   }, []);
 
+  const restoreKnights = useCallback(() => setKnightsTeam(DEFAULT_TEAM), []);
+
   return (
     <Container>
       <Grid
         setActualBattle={setActualBattle}
         updateKnightsLifes={updateKnightsLifes}
+        restoreKnights={restoreKnights}
         setTime={setTime}
       />
       <div className="game-info">
