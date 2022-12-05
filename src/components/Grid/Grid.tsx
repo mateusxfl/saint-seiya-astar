@@ -94,6 +94,10 @@ const Grid: React.FC<GridProps> = ({
     );
   }
 
+  function isVisited(column: number, row: number) {
+    return visitedPoints.find(item => item.x === column && item.y === row);
+  }
+
   const isTheDestination = useCallback(
     (row: number, column: number) =>
       row === destination.y && column === destination.x,
@@ -235,6 +239,7 @@ const Grid: React.FC<GridProps> = ({
               row={y}
               type={getType(column)}
               currentPoint={isActualPoint(x, y)}
+              isVisited={!!isVisited(x, y)}
             />
           ))}
         </div>

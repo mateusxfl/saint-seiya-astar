@@ -62,4 +62,34 @@ export const Container = styled.div<GridPointProps>`
   &[type='currentPoint-house'] {
     background-image: url('../../assets/grid/current/house.gif');
   }
+
+  &[type='visited-begin'] {
+    background-size: cover;
+    background-image: url('../../assets/grid/visited/sand.gif');
+  }
+
+  &[type='visited-montain'] {
+    background-size: cover;
+    background-image: url('../../assets/grid/visited/mountain.gif');
+  }
+
+  &[type='visited-plan'] {
+    background-size: cover;
+    background-image: url('../../assets/grid/visited/plan.gif');
+  }
+
+  &[type='visited-rock'] {
+    background-size: cover;
+    background-image: url('../../assets/grid/visited/rocky.gif');
+  }
+
+  &[type='visited-house'] {
+    background-size: cover;
+    background-image: url('../../assets/grid/visited/house.gif');
+  }
+
+  &[type='visited-house'] {
+    background-size: cover;
+    background-image: url('../../assets/grid/visited/house.gif');
+  }
 `;
