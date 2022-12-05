@@ -23,9 +23,7 @@ class SaintBattles {
   }
 
   public getBattles() {
-    return [...this.battles].sort(
-      (a, b) => a.house.difficulty - b.house.difficulty,
-    );
+    return [...this.battles].sort((a, b) => a.house.id - b.house.id);
   }
 
   public getTime() {
@@ -44,9 +42,9 @@ class SaintBattles {
   public printSolutions() {
     const solutions: any[] = [];
 
-    this.battles.sort((a, b) => a.house.difficulty - b.house.difficulty);
+    const battles = this.getBattles();
 
-    this.battles.forEach(battle => {
+    battles.forEach(battle => {
       if (battle.getKnightsTeam().length) {
         solutions.push(battle.getTeamInfo());
       } else {
@@ -82,7 +80,7 @@ class SaintBattles {
 
   public execute() {
     this.startBattles();
-    // this.printSolutions();
+    this.printSolutions();
     // this.printTimeSpent();
   }
 }
